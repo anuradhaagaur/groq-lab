@@ -300,3 +300,4 @@ export const AmbientWorkspace: React.FC<AmbientWorkspaceProps> = ({ isGenerating
     />
   );
 };
+
