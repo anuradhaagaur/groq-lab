@@ -34,8 +34,31 @@ import { PromptLabView } from './components/promptLab/PromptLabView';
 import { ModelComparisonView } from './components/modelComparison/ModelComparisonView';
 import { ApiKeyModal } from './components/apiKey/ApiKeyModal';
 import { SavedPromptsModal } from './components/savedPrompts/SavedPromptsModal';
+import { TokenCollisionIntro } from './components/intro/TokenCollisionIntro';
 
 export const App: React.FC = () => {
+  // --- Intro Cinematic State ---
+  const [showIntro, setShowIntro] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('groq_lab_intro_seen') !== 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    try {
+      sessionStorage.setItem('groq_lab_intro_seen', 'true');
+    } catch {
+      // Ignore
+    }
+  };
+
+  const handleReplayIntro = () => {
+    setShowIntro(true);
+  };
+
   // --- API Key & Models State ---
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [apiKeyStorageType, setApiKeyStorageType] = useState<'session' | 'local' | null>(null);
@@ -503,77 +526,88 @@ export const App: React.FC = () => {
   const currentModel = models.find((m) => m.id === selectedModelId) || models[0];
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-lab-bg text-lab-text select-none">
-      {/* Left Sidebar (Desktop) */}
-      <div className="hidden md:flex h-full">
-        <Sidebar
-          conversations={conversations}
-          activeConversationId={activeConversationId}
-          onSelectConversation={handleSelectConversation}
-          onNewConversation={handleNewConversation}
-          onRenameConversation={handleRenameConversation}
-          onDeleteConversation={handleDeleteConversation}
-          activeTab={activeTab}
-          onSelectTab={setActiveTab}
-          onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
-          onOpenSavedPromptsModal={() => setIsSavedPromptsModalOpen(true)}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        />
-      </div>
+    <>
+      {/* Cinematic Token Collision Intro */}
+      {showIntro && <TokenCollisionIntro onComplete={handleIntroComplete} />}
 
-      {/* Left Sidebar (Mobile Drawer) */}
-      {isSidebarMobileOpen && (
-        <div className="fixed inset-0 z-40 flex md:hidden">
-          <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setIsSidebarMobileOpen(false)}
+      <div
+        className={`flex h-screen w-screen overflow-hidden bg-lab-bg text-lab-text select-none transition-all duration-700 ${
+          showIntro ? 'opacity-0 scale-[0.98] blur-sm pointer-events-none' : 'opacity-100 scale-100 blur-0'
+        }`}
+      >
+        {/* Left Sidebar (Desktop) */}
+        <div className="hidden md:flex h-full">
+          <Sidebar
+            conversations={conversations}
+            activeConversationId={activeConversationId}
+            onSelectConversation={handleSelectConversation}
+            onNewConversation={handleNewConversation}
+            onRenameConversation={handleRenameConversation}
+            onDeleteConversation={handleDeleteConversation}
+            activeTab={activeTab}
+            onSelectTab={setActiveTab}
+            onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+            onOpenSavedPromptsModal={() => setIsSavedPromptsModalOpen(true)}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            onReplayIntro={handleReplayIntro}
           />
-          <div className="relative w-72 max-w-[85vw] h-full z-50">
-            <Sidebar
-              conversations={conversations}
-              activeConversationId={activeConversationId}
-              onSelectConversation={handleSelectConversation}
-              onNewConversation={handleNewConversation}
-              onRenameConversation={handleRenameConversation}
-              onDeleteConversation={handleDeleteConversation}
-              activeTab={activeTab}
-              onSelectTab={(tab) => {
-                setActiveTab(tab);
-                setIsSidebarMobileOpen(false);
-              }}
-              onOpenApiKeyModal={() => {
-                setIsApiKeyModalOpen(true);
-                setIsSidebarMobileOpen(false);
-              }}
-              onOpenSavedPromptsModal={() => {
-                setIsSavedPromptsModalOpen(true);
-                setIsSidebarMobileOpen(false);
-              }}
-              isCollapsed={false}
-              onToggleCollapse={() => setIsSidebarMobileOpen(false)}
-              isMobile={true}
-            />
-          </div>
         </div>
-      )}
 
-      {/* Center Main Stage */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
-        <Header
-          activeTab={activeTab}
-          currentModel={currentModel}
-          hasApiKey={!!apiKey}
-          apiKeyStorageType={apiKeyStorageType}
-          onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
-          onClearConversation={handleClearConversation}
-          onExportConversation={handleExportConversation}
-          onToggleSidebarMobile={() => setIsSidebarMobileOpen(true)}
-          onToggleControlPanelMobile={() => setIsControlPanelMobileOpen(true)}
-          onToggleControlPanelDesktop={() => setIsControlPanelOpen(!isControlPanelOpen)}
-          isControlPanelOpen={isControlPanelOpen}
-          messageCount={activeConversation?.messages.length || 0}
-        />
+        {/* Left Sidebar (Mobile Drawer) */}
+        {isSidebarMobileOpen && (
+          <div className="fixed inset-0 z-40 flex md:hidden">
+            <div
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+              onClick={() => setIsSidebarMobileOpen(false)}
+            />
+            <div className="relative w-72 max-w-[85vw] h-full z-50">
+              <Sidebar
+                conversations={conversations}
+                activeConversationId={activeConversationId}
+                onSelectConversation={handleSelectConversation}
+                onNewConversation={handleNewConversation}
+                onRenameConversation={handleRenameConversation}
+                onDeleteConversation={handleDeleteConversation}
+                activeTab={activeTab}
+                onSelectTab={(tab) => {
+                  setActiveTab(tab);
+                  setIsSidebarMobileOpen(false);
+                }}
+                onOpenApiKeyModal={() => {
+                  setIsApiKeyModalOpen(true);
+                  setIsSidebarMobileOpen(false);
+                }}
+                onOpenSavedPromptsModal={() => {
+                  setIsSavedPromptsModalOpen(true);
+                  setIsSidebarMobileOpen(false);
+                }}
+                isCollapsed={false}
+                onToggleCollapse={() => setIsSidebarMobileOpen(false)}
+                isMobile={true}
+                onReplayIntro={handleReplayIntro}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Center Main Stage */}
+        <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+          <Header
+            activeTab={activeTab}
+            currentModel={currentModel}
+            hasApiKey={!!apiKey}
+            apiKeyStorageType={apiKeyStorageType}
+            onOpenApiKeyModal={() => setIsApiKeyModalOpen(true)}
+            onClearConversation={handleClearConversation}
+            onExportConversation={handleExportConversation}
+            onToggleSidebarMobile={() => setIsSidebarMobileOpen(true)}
+            onToggleControlPanelMobile={() => setIsControlPanelMobileOpen(true)}
+            onToggleControlPanelDesktop={() => setIsControlPanelOpen(!isControlPanelOpen)}
+            isControlPanelOpen={isControlPanelOpen}
+            messageCount={activeConversation?.messages.length || 0}
+            onReplayIntro={handleReplayIntro}
+          />
 
         {/* View Switcher: Playground / Prompt Lab / Model Arena */}
         <main className="flex-1 flex overflow-hidden">
@@ -674,7 +708,8 @@ export const App: React.FC = () => {
         onSavePrompt={handleSavePrompt}
         onDeletePrompt={handleDeletePrompt}
       />
-    </div>
+      </div>
+    </>
   );
 };
 

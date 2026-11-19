@@ -17,6 +17,7 @@ import {
   Cpu,
   Layers,
   Terminal,
+  Play,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -33,6 +34,7 @@ interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   isMobile?: boolean;
+  onReplayIntro?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -49,6 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggleCollapse,
   isMobile = false,
+  onReplayIntro,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -144,6 +147,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <Bookmark className="w-4 h-4" />
           </button>
+
+          {onReplayIntro && (
+            <button
+              onClick={onReplayIntro}
+              className="p-2.5 text-lab-dim hover:text-groq-green rounded-lg hover:bg-white/5 transition-colors"
+              title="Replay Intro Animation"
+            >
+              <Play className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         <div className="flex flex-col items-center gap-2">
@@ -370,6 +383,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <span className="w-2 h-2 rounded-full bg-groq-green" />
         </button>
+
+        {onReplayIntro && (
+          <button
+            onClick={onReplayIntro}
+            className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-lab-bg/40 border border-lab-borderSubtle text-lab-dim hover:text-groq-green hover:border-groq-green/30 hover:bg-groq-green/5 transition-all"
+            title="Replay cinematic intro animation"
+          >
+            <div className="flex items-center gap-2">
+              <Play className="w-3 h-3 text-groq-green" />
+              <span>Replay Intro</span>
+            </div>
+            <span className="text-[10px] font-mono text-groq-green/80">Cinematic</span>
+          </button>
+        )}
       </div>
     </aside>
   );

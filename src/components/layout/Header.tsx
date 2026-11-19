@@ -10,6 +10,7 @@ import {
   Sparkles,
   Download,
   Share2,
+  Play,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -25,6 +26,7 @@ interface HeaderProps {
   onToggleControlPanelDesktop: () => void;
   isControlPanelOpen: boolean;
   messageCount: number;
+  onReplayIntro?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -40,6 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleControlPanelDesktop,
   isControlPanelOpen,
   messageCount,
+  onReplayIntro,
 }) => {
   const tabTitles = {
     playground: 'Playground',
@@ -95,6 +98,18 @@ export const Header: React.FC<HeaderProps> = ({
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
+        )}
+
+        {/* Replay Intro Button */}
+        {onReplayIntro && (
+          <button
+            onClick={onReplayIntro}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono text-lab-muted hover:text-groq-green bg-lab-panel border border-lab-border hover:border-groq-green/40 transition-all"
+            title="Replay cinematic intro animation"
+          >
+            <Play className="w-3 h-3 text-groq-green" />
+            <span>Intro</span>
+          </button>
         )}
 
         {/* API Key Connection Pill */}
