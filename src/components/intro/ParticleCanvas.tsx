@@ -522,3 +522,4 @@ export const ParticleCanvas: React.FC<ParticleCanvasProps> = ({ elapsedTime, sta
     />
   );
 };
+

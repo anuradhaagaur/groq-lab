@@ -631,6 +631,7 @@ export const App: React.FC = () => {
                 }
                 setPromptInputValue(promptText);
               }}
+              onOpenPromptLab={() => setActiveTab('prompt-lab')}
             />
           )}
 

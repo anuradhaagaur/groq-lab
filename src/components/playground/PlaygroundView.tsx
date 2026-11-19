@@ -2,7 +2,9 @@ import React, { useRef, useEffect } from 'react';
 import { ChatMessage, GenerationParams, GroqModel } from '../../types';
 import { MessageItem } from './MessageItem';
 import { PromptInput } from './PromptInput';
-import { Terminal, Cpu, Sparkles, Zap, ArrowRight, ShieldCheck, KeyRound } from 'lucide-react';
+import { AmbientWorkspace } from './AmbientWorkspace';
+import { TokenCore } from './TokenCore';
+import { Sparkles, ArrowRight, KeyRound } from 'lucide-react';
 
 interface PlaygroundViewProps {
   messages: ChatMessage[];
@@ -18,6 +20,7 @@ interface PlaygroundViewProps {
   onRetryLast: () => void;
   isGenerating: boolean;
   onSelectStarterPrompt: (promptText: string, systemPrompt?: string) => void;
+  onOpenPromptLab?: () => void;
 }
 
 export const PlaygroundView: React.FC<PlaygroundViewProps> = ({
@@ -34,6 +37,7 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({
   onRetryLast,
   isGenerating,
   onSelectStarterPrompt,
+  onOpenPromptLab,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -88,19 +92,23 @@ Deduce the consequences for everyday visual perception, relativistic Doppler shi
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-lab-bg">
+    <div className="relative flex-1 flex flex-col h-full overflow-hidden bg-[#07090d]">
+      {/* Layered Living Computational Environment */}
+      <AmbientWorkspace isGenerating={isGenerating} />
+
       {/* Scrollable Chat Area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div className="relative z-10 flex-1 overflow-y-auto custom-scrollbar">
         {messages.length === 0 ? (
-          /* Empty State / Welcome Screen */
-          <div className="max-w-3xl mx-auto px-4 py-12 flex flex-col items-center text-center space-y-6">
-            <div className="w-14 h-14 rounded-2xl bg-groq-green/10 border border-groq-green/30 flex items-center justify-center text-groq-green shadow-xl shadow-groq-green/10">
-              <Terminal className="w-7 h-7" />
+          /* Empty State / Welcome Screen with Animated Token Core */
+          <div className="max-w-3xl mx-auto px-4 py-12 flex flex-col items-center text-center space-y-6 transition-all duration-500">
+            {/* Animated Interactive Token Core */}
+            <div className="flex items-center justify-center pt-2">
+              <TokenCore />
             </div>
 
             <div className="space-y-2">
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-lab-text">
-                Welcome to <span className="text-groq-green">GROQ LAB</span>
+                Welcome to <span className="text-[#00F5A0]">GROQ LAB</span>
               </h2>
               <p className="text-xs sm:text-sm text-lab-muted max-w-lg mx-auto leading-relaxed">
                 A high-speed LLM experimentation console powered by Groq LPUs. Experiment with Zero-shot, One-shot, and Few-shot prompting, analyze telemetry, and inspect real token performance.
@@ -109,8 +117,8 @@ Deduce the consequences for everyday visual perception, relativistic Doppler shi
 
             {/* API Key Banner if not connected */}
             {!hasApiKey && (
-              <div className="w-full max-w-md p-4 bg-[#141824] border border-groq-green/30 rounded-xl space-y-3 text-left">
-                <div className="flex items-center gap-2 text-xs font-semibold text-groq-green">
+              <div className="w-full max-w-md p-4 bg-[#0e121b]/90 border border-[#00F5A0]/30 rounded-xl space-y-3 text-left shadow-lg shadow-black/40 backdrop-blur-md">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#00F5A0]">
                   <KeyRound className="w-4 h-4" />
                   Connect Groq API Key to Begin
                 </div>
@@ -119,7 +127,7 @@ Deduce the consequences for everyday visual perception, relativistic Doppler shi
                 </p>
                 <button
                   onClick={onOpenApiKeyModal}
-                  className="w-full py-2 bg-groq-green text-black font-semibold text-xs rounded-lg hover:bg-groq-greenHover transition-all shadow-md shadow-groq-green/10 flex items-center justify-center gap-2"
+                  className="w-full py-2 bg-[#00F5A0] text-black font-semibold text-xs rounded-lg hover:bg-[#00dc8b] transition-all shadow-md shadow-[#00F5A0]/20 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <KeyRound className="w-3.5 h-3.5" />
                   Enter Groq API Key
@@ -139,14 +147,14 @@ Deduce the consequences for everyday visual perception, relativistic Doppler shi
                   <button
                     key={idx}
                     onClick={() => onSelectStarterPrompt(card.prompt)}
-                    className="p-3.5 bg-lab-panel/70 border border-lab-border hover:border-groq-green/40 hover:bg-lab-elevated rounded-xl transition-all group flex flex-col justify-between space-y-3 text-xs"
+                    className="p-3.5 bg-lab-panel/80 border border-lab-border hover:border-[#00F5A0]/40 hover:bg-lab-elevated rounded-xl transition-all group flex flex-col justify-between space-y-3 text-xs backdrop-blur-sm cursor-pointer"
                   >
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-lab-bg text-groq-green border border-groq-green/20">
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-lab-bg text-[#00F5A0] border border-[#00F5A0]/20">
                           {card.type}
                         </span>
-                        <ArrowRight className="w-3.5 h-3.5 text-lab-dim group-hover:text-groq-green group-hover:translate-x-0.5 transition-all" />
+                        <ArrowRight className="w-3.5 h-3.5 text-lab-dim group-hover:text-[#00F5A0] group-hover:translate-x-0.5 transition-all" />
                       </div>
                       <h4 className="font-semibold text-lab-text group-hover:text-white">
                         {card.title}
@@ -156,7 +164,7 @@ Deduce the consequences for everyday visual perception, relativistic Doppler shi
                       </p>
                     </div>
 
-                    <span className="text-[10px] text-groq-green font-mono">Click to load prompt →</span>
+                    <span className="text-[10px] text-[#00F5A0] font-mono">Click to load prompt →</span>
                   </button>
                 ))}
               </div>
@@ -179,7 +187,7 @@ Deduce the consequences for everyday visual perception, relativistic Doppler shi
         )}
       </div>
 
-      {/* Bottom Prompt Input Area */}
+      {/* Bottom Command Console Input Area */}
       <PromptInput
         value={promptInputValue}
         onChange={setPromptInputValue}
@@ -189,6 +197,7 @@ Deduce the consequences for everyday visual perception, relativistic Doppler shi
         isGenerating={isGenerating}
         disabled={!hasApiKey}
         disabledPlaceholder={!hasApiKey ? 'Connect your Groq API key (above) to start experimenting...' : undefined}
+        onOpenPromptLab={onOpenPromptLab}
       />
     </div>
   );
